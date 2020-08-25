@@ -1,0 +1,52 @@
+{
+  "name": "http-proxy-middleware-secure-cookies",
+  "version": "0.1.0",
+  "description": "Securely add cookies to your http-proxy requests",
+  "main": "dist/lib/secureCookieProxy.js",
+  "esm": "dist/esm/secureCookieProxy.js",
+  "scripts": {
+    "build": "tsc && tsc --project tsconfig.esm.json",
+    "test": "jest",
+    "format": "prettier src/*",
+    "lint": "eslint --ext ts src/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ktmud/http-proxy-middleware-secure-cookies.git"
+  },
+  "keywords": [
+    "http",
+    "proxy",
+    "cookies",
+    "dev",
+    "server",
+    "webpack",
+    "security"
+  ],
+  "author": "Jesse Yang <hello@yjc.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ktmud/http-proxy-middleware-secure-cookies/issues"
+  },
+  "homepage": "https://github.com/ktmud/http-proxy-middleware-secure-cookies#readme",
+  "dependencies": {
+    "@types/cookie": "^0.4.0",
+    "@types/http-proxy-middleware": "^0.19.3",
+    "cookie": "^0.4.1",
+    "inquirer": "^7.3.3",
+    "keytar": "^6.0.1",
+    "prettier": "^2.1.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "eslint": "^7.7.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "http-proxy-middleware": ">=0.19 <2"
+  }
+}
