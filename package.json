@@ -8,7 +8,8 @@
     "build": "tsc && tsc --project tsconfig.esm.json",
     "test": "jest",
     "format": "prettier src/*",
-    "lint": "eslint --ext ts src/*"
+    "lint": "eslint --ext ts src/*",
+    "prepublishOnly": "yarn build"
   },
   "repository": {
     "type": "git",

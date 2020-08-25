@@ -11,12 +11,18 @@ const SERVICE = 'HttpProxySecureCookies';
 
 type Cookies = { [key: string]: string };
 
+/**
+ * Serialize cookies object to the cookie string as seen in request headers.
+ */
 function toCookieString(cookies: Cookies) {
   return Object.entries(cookies)
     .map(([key, value]) => serializeCookie(key, value))
     .join('; ');
 }
 
+/**
+ * Parse the `Set-Cookie` header from remote servers.
+ */
 function parseSetCookie(
   cookieHeaders?: string | number | string[],
 ): [string[], Cookies] {
@@ -99,6 +105,9 @@ export default function secureCookieProxy(
     return cookieString;
   }
 
+  /**
+   * Read cookies from keychain or user input.
+   */
   async function getCookies(message?: string) {
     if (waitingForInput) return null;
     try {
