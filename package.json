@@ -6,6 +6,7 @@
   "esm": "dist/esm/secureCookieProxy.js",
   "scripts": {
     "build": "tsc && tsc --project tsconfig.esm.json",
+    "start": "yarn build && yarn example",
     "test": "jest",
     "format": "prettier src/*",
     "lint": "eslint --ext ts src/*",

@@ -64,13 +64,16 @@ export interface SecureCookieProxyOptions extends ProxyOptions {
 /**
  * Generate a proxy config that points to a remote host.
  */
-export default function secureCookieProxy(
+export function secureCookieProxy(
   options: string | SecureCookieProxyOptions,
 ): ProxyOptions {
   const {
     target,
     keychainAccount,
+    secure = false,
+    changeOrigin = true,
     unauthorizedStatusCode = [401],
+    cookiePathRewrite,
     cookieRewrite,
     ...restOptions
   }: SecureCookieProxyOptions =
@@ -101,7 +104,7 @@ export default function secureCookieProxy(
     ]);
     await setPassword(SERVICE, account, cookieString);
     waitingForInput = false;
-    console.log('\nSuccessfully saved your cookie. Please refresh.');
+    console.log('\nSuccessfully saved your cookie. Please refresh.\n');
     return cookieString;
   }
 
@@ -122,28 +125,31 @@ export default function secureCookieProxy(
   }
 
   /**
-   * Add secure cookies to proxy request header
+   * Add secure cookies to proxy request header.
    */
   function addCookie(proxyReq: ClientRequest, req: IncomingMessage) {
-    proxyReq.setHeader(
-      'cookie',
-      toCookieString({
-        ...secureCookies,
-        ...parseCookies(req.headers.cookie || ''),
-      }),
-    );
+    // if not cookies found, ask for user input
+    if (!secureCookies || Object.keys(secureCookies).length === 0) {
+      getCookies(`
+No stored cookies found for proxy target ${keychainAccount}.
+Copy and paste your cookies to get authenticated:`);
+    } else {
+      proxyReq.setHeader(
+        'cookie',
+        toCookieString({
+          ...secureCookies,
+          ...parseCookies(req.headers.cookie || ''),
+        }),
+      );
+    }
   }
 
   // quitely get initial cookies
-  getCookies().then(cookies => {
-    if (!cookies || Object.keys(cookies).length === 0) {
-      getCookies(`No stored cookies found for proxy to ${target}. Copy and paste your auth cookies below to get authenticated:`)
-    }
-  });
+  getCookies();
 
   return {
-    secure: false,
-    changeOrigin: true,
+    secure,
+    changeOrigin,
     target,
     ws: target.startsWith('ws'),
     ...restOptions,
@@ -170,12 +176,19 @@ It will be securely stored in system keychain:`);
         const clientCookies = cookieRewrite
           ? cookieRewrite(secureCookies)
           : secureCookies;
+        // by default rewrite cookie to root path
+        const cookiePath =
+          typeof cookiePathRewrite === 'string' ? cookiePathRewrite : '/';
+
         let hasMissingCookie = false;
+
         Object.keys(clientCookies).forEach((key) => {
           if (!(key in reqCookies) && !(key in resCookies)) {
             // set all secure cookie to the root path
             cookieHeaders.push(
-              serializeCookie(key, clientCookies[key], { path: '/' }),
+              serializeCookie(key, clientCookies[key], {
+                path: cookiePath,
+              }),
             );
             hasMissingCookie = true;
           }
@@ -187,3 +200,5 @@ It will be securely stored in system keychain:`);
     },
   };
 }
+
+export default secureCookieProxy;

@@ -1,6 +1,8 @@
 # http-proxy-middleware-secure-cookies
 
-Create a [http-proxy-middleware](https://www.npmjs.com/package/http-proxy-middleware) that securly make requests with cookies. Normally used in a [webpack-dev-server](https://www.npmjs.com/package/webpack-dev-server).
+Securely make authenticated requests to a remote server inside Webpack Dev Server proxies.
+
+This library helps you create an [http-proxy-middleware](https://www.npmjs.com/package/http-proxy-middleware) that securly makes proxy requests with cookies. It will prompt you to enter auth cookies at initial start or when authentication failed.
 
 ## Problem Statement
 
@@ -13,7 +15,7 @@ Now the tricky thing is the production service may require authentication. You l
 In `webpack.config.js`, add `devServer` proxy rules like below:
 
 ```ts
-const secureCookiesProxy = require('http-proxy-middleware-secure-cookies');
+const { secureCookiesProxy } = require('http-proxy-middleware-secure-cookies');
 
 module.exports = {
   // ...
@@ -39,6 +41,10 @@ module.exports = config;
 ```
 
 This will automatically proxy local requests for `http://locahost:$PORT/proxy/*` to `https://proxy-target.example.com`. If the server returns a `401` HTTP status code, the dev server will automatically prompt you to enter a cookie string, store it in system keychain, and use the cookies to authenticate future requests.
+
+## Options
+
+Pass options via `secureCookieProxy(options)`.
 
 ## License
 

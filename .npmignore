@@ -5,3 +5,4 @@ src
 .prettierignore
 tsconfig.json
 tsconfig.esm.json
+example
