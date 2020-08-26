@@ -135,7 +135,11 @@ export default function secureCookieProxy(
   }
 
   // quitely get initial cookies
-  getCookies();
+  getCookies().then(cookies => {
+    if (!cookies || Object.keys(cookies).length === 0) {
+      getCookies(`No stored cookies found for proxy to ${target}. Copy and paste your auth cookies below to get authenticated:`)
+    }
+  });
 
   return {
     secure: false,

@@ -1,7 +1,7 @@
 module.exports = {
   env: {
-    browser: true,
-    es2020: true,
+    browser: false,
+    node: true,
   },
   extends: ['plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
@@ -11,4 +11,12 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {},
+  overrides: [
+    {
+      files: '**/*.js',
+      rules: {
+        '@typescript-eslint/no-var-requires': 0,
+      },
+    },
+  ],
 };
