@@ -40,7 +40,7 @@ function parseSetCookie(
   ];
 }
 
-const waitingForInput: Record<string, boolean> = {};
+let waitingForInput = false;
 
 export interface SecureCookieProxyOptions extends ProxyOptions {
   /**
@@ -87,14 +87,15 @@ export function secureCookieProxy(
   );
 
   let secureCookies: Cookies | undefined;
-  waitingForInput[account] = false;
 
   async function getFromKeyChain() {
     return storage.get(account);
   }
 
   async function askForUserInput(message: string): Promise<string | null> {
-    waitingForInput[account] = true;
+    // waitingForInput flag is global as it is a little confusing if there are
+    // two ongoing prompts.
+    waitingForInput = true;
     const { cookieString } = await inquirer.prompt<{ cookieString: string }>([
       {
         type: 'password',
@@ -102,25 +103,32 @@ export function secureCookieProxy(
         message,
       },
     ]);
-    await storage.set(account, cookieString);
-    waitingForInput[account] = false;
-    console.log('\nSuccessfully saved your cookie. Please refresh.\n');
-    return cookieString;
+    const cleanCookieString = cookieString.replace(/^\s*Cookie:\s*/i, '');
+
+    if (cleanCookieString) {
+      // clean up the typical header name when copying directly from Chrome DevTools
+      await storage.set(account, cleanCookieString);
+      console.log('\nSuccessfully saved your cookie. Please refresh.\n');
+    } else {
+      console.log('\nNo cookies provided.');
+    }
+    waitingForInput = false;
+    return cleanCookieString;
   }
 
   /**
    * Read cookies from keychain or user input.
    */
   async function getCookies(message?: string) {
-    if (waitingForInput[account]) return null;
+    if (waitingForInput) return null;
     try {
       secureCookies = parseCookies(
         (message ? await askForUserInput(message) : await getFromKeyChain()) ||
           '',
       );
     } catch (error) {
+      console.error('Failed to get valid cookies.');
       console.error(error);
-      // await getCookies('Invalid cookie string, please try again: ');
     }
     return secureCookies;
   }
@@ -153,6 +161,7 @@ Copy and paste your cookies to get authenticated:`);
     changeOrigin,
     target,
     ws: target.startsWith('ws'),
+    cookiePathRewrite,
     ...restOptions,
     onProxyReq: addCookie,
     onProxyReqWs: addCookie,

@@ -39,6 +39,12 @@ try {
   const writeFile = promisify(fs.writeFile);
   const readFile = promisify(fs.readFile);
   let cookieDirectory = path.join(os.homedir(), '.proxy-cookies');
+  const getCookieFilePath = (account: string) => {
+    return path.join(
+      cookieDirectory,
+      `${account.replace(/[^a-z0-9\.\-]/gi, '_').toLowerCase()}.txt`,
+    );
+  };
 
   storage.setCookieDirectory = (directory: string) => {
     cookieDirectory = directory;
@@ -46,7 +52,7 @@ try {
 
   storage.get = async function getCookies(account) {
     try {
-      const cookieFile = path.join(cookieDirectory, account);
+      const cookieFile = getCookieFilePath(account);
       return await readFile(cookieFile, { encoding: 'utf-8' });
     } catch (error) {
       return null;
@@ -54,7 +60,7 @@ try {
   };
   storage.set = async function setCookies(account, secrets) {
     await prepareDirectory(cookieDirectory);
-    const cookieFile = path.join(cookieDirectory, account);
+    const cookieFile = getCookieFilePath(account);
     return await writeFile(cookieFile, secrets, { encoding: 'utf-8' });
   };
 }

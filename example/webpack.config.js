@@ -1,34 +1,41 @@
 const { secureCookieProxy } = require('../dist/lib/secureCookieProxy');
 
-const googleStaticProxy = secureCookieProxy({
-  target: 'https://www.google.com',
-  keychainAccount: 'google',
-});
-
 module.exports = {
   entry: `${__dirname}/src/index.js`,
   devServer: {
     contentBase: __dirname,
     stats: 'minimal',
     clientLogLevel: 'debug',
-    proxy: {
-      '/google': secureCookieProxy({
-        target: 'https://www.google.com',
-        keychainAccount: 'google',
-        pathRewrite: {
-          '^/google': '/',
-        },
-        cookiePathRewrite: '/google',
-      }),
-      '/images': googleStaticProxy,
-      '/xjs': googleStaticProxy,
-      '/facebook': secureCookieProxy({
-        target: 'https://www.facebook.com',
-        pathRewrite: {
-          '^/facebook': '/',
-        },
-        cookiePathRewrite: '/facebook',
-      }),
-    },
+    proxy: [
+      {
+        context: '/google',
+        ...secureCookieProxy({
+          target: 'https://www.google.com',
+          keychainAccount: 'google.com--my-name',
+          cookieDomainRewrite: '',
+          pathRewrite: {
+            '^/google': '/',
+          },
+          cookiePathRewrite: '/google',
+        }),
+      },
+      {
+        context: path => /^\/(complete|logos|images|gen_204|client_204)/.test(path),
+        ...secureCookieProxy({
+          target: 'https://www.google.com',
+          keychainAccount: 'google-static',
+        }),
+      },
+      {
+        context: '/facebook',
+        ...secureCookieProxy({
+          target: 'https://www.facebook.com',
+          pathRewrite: {
+            '^/facebook': '/',
+          },
+          cookiePathRewrite: '/facebook',
+        }),
+      },
+    ],
   },
 };
