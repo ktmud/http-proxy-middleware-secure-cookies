@@ -1,6 +1,6 @@
 {
   "name": "http-proxy-middleware-secure-cookies",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Securely add cookies to your http-proxy requests",
   "main": "dist/lib/secureCookieProxy.js",
   "esm": "dist/esm/secureCookieProxy.js",
