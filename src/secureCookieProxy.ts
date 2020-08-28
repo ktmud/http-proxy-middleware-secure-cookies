@@ -3,11 +3,9 @@
  */
 import { ClientRequest, IncomingMessage } from 'http';
 import { Config as ProxyOptions } from 'http-proxy-middleware';
-import { getPassword, setPassword } from 'keytar';
+import storage from './cookieStorage';
 import { parse as parseCookies, serialize as serializeCookie } from 'cookie';
 import * as inquirer from 'inquirer';
-
-const SERVICE = 'HttpProxySecureCookies';
 
 type Cookies = { [key: string]: string };
 
@@ -42,6 +40,8 @@ function parseSetCookie(
   ];
 }
 
+const waitingForInput: Record<string, boolean> = {};
+
 export interface SecureCookieProxyOptions extends ProxyOptions {
   /**
    * Target proxy destination.
@@ -52,7 +52,7 @@ export interface SecureCookieProxyOptions extends ProxyOptions {
    */
   unauthorizedStatusCode?: number | number[];
   /**
-   * The account name for the cookies saved in keychain.
+   * The account name used to save cookies in system keychain or a local file.
    */
   keychainAccount?: string;
   /**
@@ -87,14 +87,14 @@ export function secureCookieProxy(
   );
 
   let secureCookies: Cookies | undefined;
-  let waitingForInput = false;
+  waitingForInput[account] = false;
 
   async function getFromKeyChain() {
-    return getPassword(SERVICE, account);
+    return storage.get(account);
   }
 
   async function askForUserInput(message: string): Promise<string | null> {
-    waitingForInput = true;
+    waitingForInput[account] = true;
     const { cookieString } = await inquirer.prompt<{ cookieString: string }>([
       {
         type: 'password',
@@ -102,8 +102,8 @@ export function secureCookieProxy(
         message,
       },
     ]);
-    await setPassword(SERVICE, account, cookieString);
-    waitingForInput = false;
+    await storage.set(account, cookieString);
+    waitingForInput[account] = false;
     console.log('\nSuccessfully saved your cookie. Please refresh.\n');
     return cookieString;
   }
@@ -112,14 +112,15 @@ export function secureCookieProxy(
    * Read cookies from keychain or user input.
    */
   async function getCookies(message?: string) {
-    if (waitingForInput) return null;
+    if (waitingForInput[account]) return null;
     try {
       secureCookies = parseCookies(
         (message ? await askForUserInput(message) : await getFromKeyChain()) ||
           '',
       );
-    } catch {
-      await getCookies('Invalid cookie string, please try again: ');
+    } catch (error) {
+      console.error(error);
+      // await getCookies('Invalid cookie string, please try again: ');
     }
     return secureCookies;
   }

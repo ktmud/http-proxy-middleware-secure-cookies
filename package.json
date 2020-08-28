@@ -37,8 +37,7 @@
     "@types/http-proxy-middleware": "^0.19.3",
     "@types/inquirer": "^7.3.1",
     "cookie": "^0.4.1",
-    "inquirer": "^7.3.3",
-    "keytar": "^6.0.1"
+    "inquirer": "^7.3.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.10.1",
@@ -55,5 +54,8 @@
   },
   "peerDependencies": {
     "http-proxy-middleware": ">=0.19 <2"
+  },
+  "optionalDependencies": {
+    "keytar": "^6.0.1"
   }
 }

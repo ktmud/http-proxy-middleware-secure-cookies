@@ -40,7 +40,18 @@ module.exports = {
 module.exports = config;
 ```
 
-This will automatically proxy local requests for `http://locahost:$PORT/proxy/*` to `https://proxy-target.example.com`. If the server returns a `401` HTTP status code, the dev server will automatically prompt you to enter a cookie string, store it in system keychain, and use the cookies to authenticate future requests.
+This will automatically proxy local requests for `http://locahost:$PORT/proxy/*` to `https://proxy-target.example.com`. If the server returns a `401` HTTP status code, the dev server will automatically prompt you to enter a cookie string, store it in file system or the system keychain (when available), then use the cookies to authenticate future requests.
+
+### Secure Cookie Storage
+
+By default, the package will try to install `node-keytar` to store the cookies in system keychain, if for some reason the installation failed (e.g., [libsecret](https://github.com/atom/node-keytar#on-linux) not pre-installed on Linux), we will fallback to using local files. By default the local file used is `~/.proxy-cookies/[keychainAccount]`. You can change the storage directory with following code (not recommended):
+
+```js
+const { setCookieDirectory } = require('http-proxy-middleware-secure-cookies/dist/storage');
+
+// change it to save under current working directory
+setCookieDirectory(`${process.cwd()}/.proxy-cookies`);
+```
 
 ## Options
 
