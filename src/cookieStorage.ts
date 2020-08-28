@@ -4,7 +4,6 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import { promisify } from 'util';
 
 const fileExists = promisify(fs.exists);
@@ -38,7 +37,7 @@ try {
 } catch (error) {
   const writeFile = promisify(fs.writeFile);
   const readFile = promisify(fs.readFile);
-  let cookieDirectory = path.join(os.homedir(), '.proxy-cookies');
+  let cookieDirectory = path.join(process.cwd(), '.proxy-cookies');
   const getCookieFilePath = (account: string) => {
     return path.join(
       cookieDirectory,

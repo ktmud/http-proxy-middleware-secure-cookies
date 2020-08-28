@@ -44,13 +44,14 @@ This will automatically proxy local requests for `http://locahost:$PORT/proxy/*`
 
 ### Secure Cookie Storage
 
-By default, the package will try to install `node-keytar` to store the cookies in system keychain, if for some reason the installation failed (e.g., [libsecret](https://github.com/atom/node-keytar#on-linux) not pre-installed on Linux), we will fallback to using local files. By default the local file used is `~/.proxy-cookies/[keychainAccount]`. You can change the storage directory with following code (not recommended):
+By default, the package will try to install `node-keytar` to store the cookies in system keychain, if for some reason the installation failed (e.g., [libsecret](https://github.com/atom/node-keytar#on-linux) not pre-installed on Linux), we will fallback to using local files. By default the local file used is `${process.cwd()}/.proxy-cookies/[keychainAccount]`. You can change the storage directory with following code (not recommended):
 
 ```js
+const os = require('os');
 const { setCookieDirectory } = require('http-proxy-middleware-secure-cookies/dist/storage');
 
-// change it to save under current working directory
-setCookieDirectory(`${process.cwd()}/.proxy-cookies`);
+// change it to home directory so cookies can be shared across apps
+setCookieDirectory(`${os.homedir()}/.proxy-cookies`);
 ```
 
 ## Options
