@@ -174,7 +174,7 @@ Copy and paste your cookies to get authenticated:`);
     },
     onProxyReqWs(proxyReq, req, socket, options, head) {
       addCookie(proxyReq, req);
-      if (onProxyReq) {
+      if (onProxyReqWs) {
         onProxyReqWs(proxyReq, req, socket, options, head);
       }
     },
