@@ -75,6 +75,9 @@ export function secureCookieProxy(
     unauthorizedStatusCode = [401],
     cookiePathRewrite,
     cookieRewrite,
+    onProxyReq,
+    onProxyReqWs,
+    onProxyRes,
     ...restOptions
   }: SecureCookieProxyOptions =
     typeof options === 'string' ? { target: options } : options;
@@ -163,8 +166,18 @@ Copy and paste your cookies to get authenticated:`);
     ws: target.startsWith('ws'),
     cookiePathRewrite,
     ...restOptions,
-    onProxyReq: addCookie,
-    onProxyReqWs: addCookie,
+    onProxyReq(proxyReq, req, res) {
+      addCookie(proxyReq, req);
+      if (onProxyReq) {
+        onProxyReq(proxyReq, req, res);
+      }
+    },
+    onProxyReqWs(proxyReq, req, socket, options, head) {
+      addCookie(proxyReq, req);
+      if (onProxyReq) {
+        onProxyReqWs(proxyReq, req, socket, options, head);
+      }
+    },
     onProxyRes(proxyRes, req, res) {
       // update cookies if API returns 401
       if (proxyRes.statusCode && unauthroizedCode.has(proxyRes.statusCode)) {
@@ -206,6 +219,9 @@ It will be securely stored in system keychain:`);
         if (hasMissingCookie) {
           res.setHeader('Set-Cookie', cookieHeaders);
         }
+      }
+      if (onProxyRes) {
+        onProxyRes(proxyRes, req, res);
       }
     },
   };
