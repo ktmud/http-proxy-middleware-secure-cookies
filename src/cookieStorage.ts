@@ -10,6 +10,7 @@ const fileExists = promisify(fs.exists);
 const mkdir = promisify(fs.mkdir);
 
 const storage: {
+  isKeyChain?: boolean;
   get?: (account: string) => Promise<string>;
   set?: (account: string, secrets: string) => Promise<void>;
   setCookieDirectory?: (directory: string) => void;
@@ -34,6 +35,7 @@ try {
   storage.set = async function setCookies(account, secrets) {
     return setPassword(SERVICE, account, secrets);
   };
+  storage.isKeyChain = true;
 } catch (error) {
   const writeFile = promisify(fs.writeFile);
   const readFile = promisify(fs.readFile);

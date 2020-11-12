@@ -181,13 +181,17 @@ Copy and paste your cookies to get authenticated:`);
     onProxyRes(proxyRes, req, res) {
       // update cookies if API returns 401
       if (proxyRes.statusCode && unauthroizedCode.has(proxyRes.statusCode)) {
-        getCookies(`
+        let message = `
 Authentication failed for ${target}${req.url}
 
-You either haven't provide an auth cookie or it expired.
-Please login to ${target} and copy the HTTP cookie string here.
+You either haven't provided an auth cookie or it expired.
+Please login to ${target} and copy the HTTP cookie string here`;
+        if (storage.isKeyChain) {
+          message += `.
 
-It will be securely stored in system keychain:`);
+It will be securely stored in system keychain:`;
+        }
+        getCookies(`${message}:`);
       }
       // add missing cookies to the response so they can be used on the client
       // side as well.

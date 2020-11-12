@@ -8,7 +8,7 @@
     "build": "tsc && tsc --project tsconfig.esm.json",
     "start": "yarn build && yarn example",
     "test": "jest",
-    "format": "prettier src/*",
+    "format": "prettier --write src/*",
     "lint": "eslint --ext ts src/*",
     "prepublishOnly": "yarn build",
     "example": "webpack-dev-server --config example/webpack.config.js"
@@ -57,5 +57,10 @@
   },
   "optionalDependencies": {
     "keytar": "^6.0.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "always",
+    "trailingComma": "all"
   }
 }
