@@ -15,7 +15,7 @@ Now the tricky thing is the production service may require authentication. You l
 In `webpack.config.js`, add `devServer` proxy rules like below:
 
 ```ts
-const { secureCookiesProxy } = require('http-proxy-middleware-secure-cookies');
+const { secureCookieProxy } = require('http-proxy-middleware-secure-cookies');
 
 module.exports = {
   // ...
@@ -23,14 +23,14 @@ module.exports = {
     // ...
     proxy: {
       // use the default options to proxy /api/* to https://foo.example.com/api/*
-      '/api/*': secureCookiesProxy('https://api.example.com'),
+      '/api/*': secureCookieProxy('https://api.example.com'),
 
       // different endpoints share the same account
-      '/proxy/fiz': secureCookiesProxy({
+      '/proxy/fiz': secureCookieProxy({
         target: 'https://bar.example.com',
         keychainAccount: 'example.com',
       });
-      '/proxy/buz': secureCookiesProxy({
+      '/proxy/buz': secureCookieProxy({
         target: 'https://buz.example.com',
         keychainAccount: 'example.com',
       });
